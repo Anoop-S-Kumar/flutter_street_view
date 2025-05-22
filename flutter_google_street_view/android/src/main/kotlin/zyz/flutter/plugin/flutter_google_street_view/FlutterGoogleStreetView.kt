@@ -616,9 +616,24 @@ class FlutterGoogleStreetView(
 
     override fun onStreetViewPanoramaChange(location: StreetViewPanoramaLocation?) {
          if (location == null) {
-        // You could also send a null message to Dart side if needed
+        // Notify Flutter that no panorama is available
+        val args = HashMap<String, Any?>()
+        args["lat"] = null
+        args["lng"] = null
+
+        channel.invokeMethod("onPanoramaChange", args)
         return
     }
+
+    // When a valid panorama location is available
+    val lat = location.position.latitude
+    val lng = location.position.longitude
+
+    val args = HashMap<String, Any>()
+    args["lat"] = lat
+    args["lng"] = lng
+
+    channel.invokeMethod("onPanoramaChange", args)
         if (viewReadyResult != null) {
             val hasInitLocation = initOptions?.let { it1 ->
                 it1.panoramaId != null || it1.position != null
